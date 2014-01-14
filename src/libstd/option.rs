@@ -42,15 +42,17 @@ use clone::Clone;
 use clone::DeepClone;
 use cmp::{Eq, TotalEq, TotalOrd};
 use default::Default;
-use fmt;
+// use fmt;
 use iter::{Iterator, DoubleEndedIterator, FromIterator, ExactSize};
 use kinds::Send;
-use str::OwnedStr;
-use to_str::ToStr;
+// use str::OwnedStr;
+// use to_str::ToStr;
 use util;
 
 /// The option type
-#[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd, ToStr)]
+/// XXX bare-metal
+// #[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd, ToStr)]
+#[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd)]
 pub enum Option<T> {
     /// No value
     None,
@@ -108,7 +110,9 @@ impl<T> Option<T> {
     pub fn expect<M: Any + Send>(self, msg: M) -> T {
         match self {
             Some(val) => val,
-            None => fail!(msg),
+            // XXX bare-metal
+            // None => fail!(msg),
+            None => unsafe { ::unstable::intrinsics::abort() },
         }
     }
 
@@ -130,7 +134,9 @@ impl<T> Option<T> {
     pub fn unwrap(self) -> T {
         match self {
             Some(val) => val,
-            None => fail!("called `Option::unwrap()` on a `None` value"),
+            // XXX bare-metal
+            // None => fail!("called `Option::unwrap()` on a `None` value"),
+            NOne => unsafe { ::unstable::intrinsics::abort() },
         }
     }
 
@@ -300,7 +306,9 @@ impl<T> Option<T> {
     #[inline]
     pub fn take_unwrap(&mut self) -> T {
         if self.is_none() {
-            fail!("called `Option::take_unwrap()` on a `None` value")
+            // XXX bare-metal
+            // fail!("called `Option::take_unwrap()` on a `None` value")
+            unsafe { ::unstable::intrinsics::abort() }
         }
         self.take().unwrap()
     }
@@ -321,7 +329,9 @@ impl<T> Option<T> {
     pub fn get_ref<'a>(&'a self) -> &'a T {
         match *self {
             Some(ref x) => x,
-            None => fail!("called `Option::get_ref()` on a `None` value"),
+            // XXX bare-metal
+            // None => fail!("called `Option::get_ref()` on a `None` value"),
+            None => unsafe { ::unstable::intrinsics::abort() },
         }
     }
 
@@ -341,7 +351,9 @@ impl<T> Option<T> {
     pub fn get_mut_ref<'a>(&'a mut self) -> &'a mut T {
         match *self {
             Some(ref mut x) => x,
-            None => fail!("called `Option::get_mut_ref()` on a `None` value"),
+            // XXX bare-metal
+            // None => fail!("called `Option::get_mut_ref()` on a `None` value"),
+            None => unsafe { ::unstable::intrinsics::abort() },
         }
     }
 }
@@ -357,6 +369,7 @@ impl<T: Default> Option<T> {
     }
 }
 
+/*
 /////////////////////////////////////////////////////////////////////////////
 // Trait implementations
 /////////////////////////////////////////////////////////////////////////////
@@ -375,6 +388,7 @@ impl<T> Default for Option<T> {
     #[inline]
     fn default() -> Option<T> { None }
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 // The Option Iterator

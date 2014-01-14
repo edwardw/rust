@@ -14,7 +14,8 @@ use cast;
 use clone::Clone;
 #[cfg(not(test))]
 use cmp::Equiv;
-use iter::{range, Iterator};
+// use iter::{range, Iterator};
+use iter::Iterator;
 use option::{Option, Some, None};
 use unstable::intrinsics;
 use util::swap;
@@ -200,16 +201,28 @@ pub fn to_mut_unsafe_ptr<T>(thing: &mut T) -> *mut T {
   SAFETY NOTE: Pointer-arithmetic. Dragons be here.
 */
 pub unsafe fn array_each_with_len<T>(arr: **T, len: uint, cb: |*T|) {
-    debug!("array_each_with_len: before iterate");
+    // XXX bare-metal
+    // debug!("array_each_with_len: before iterate");
     if (arr as uint == 0) {
-        fail!("ptr::array_each_with_len failure: arr input is null pointer");
+        // XXX bare-metal
+        // fail!("ptr::array_each_with_len failure: arr input is null pointer");
+        ::unstable::intrinsics::abort();
     }
     //let start_ptr = *arr;
+    /* XXX bare-metal
     for e in range(0, len) {
         let n = offset(arr, e as int);
         cb(*n);
     }
-    debug!("array_each_with_len: after iterate");
+    */
+    let mut i = 0;
+    while i < len {
+        let n = offset(arr, i as int);
+        cb(*n);
+        i += 1;
+    }
+    // XXX bare-metal
+    // debug!("array_each_with_len: after iterate");
 }
 
 /**
@@ -223,10 +236,13 @@ pub unsafe fn array_each_with_len<T>(arr: **T, len: uint, cb: |*T|) {
 */
 pub unsafe fn array_each<T>(arr: **T, cb: |*T|) {
     if (arr as uint == 0) {
-        fail!("ptr::array_each_with_len failure: arr input is null pointer");
+        // XXX bare-metal
+        // fail!("ptr::array_each_with_len failure: arr input is null pointer");
+        ::unstable::intrinsics::abort();
     }
     let len = buf_len(arr);
-    debug!("array_each inferred len: {}", len);
+    // XXX bare-metal
+    // debug!("array_each inferred len: {}", len);
     array_each_with_len(arr, len, cb);
 }
 
@@ -627,9 +643,10 @@ pub mod ptr_tests {
                     let expected = expected_arr[ctr].with_ref(|buf| {
                             str::raw::from_c_str(buf)
                         });
-                    debug!(
-                        "test_ptr_array_each_with_len e: {}, a: {}",
-                        expected, actual);
+                    // XXX bare-metal
+                    // debug!(
+                    //     "test_ptr_array_each_with_len e: {}, a: {}",
+                    //     expected, actual);
                     assert_eq!(actual, expected);
                     ctr += 1;
                     iteration_count += 1;
@@ -663,9 +680,10 @@ pub mod ptr_tests {
                     let expected = expected_arr[ctr].with_ref(|buf| {
                         str::raw::from_c_str(buf)
                     });
-                    debug!(
-                        "test_ptr_array_each e: {}, a: {}",
-                        expected, actual);
+                    // XXX bare-metal
+                    // debug!(
+                    //     "test_ptr_array_each e: {}, a: {}",
+                    //     expected, actual);
                     assert_eq!(actual, expected);
                     ctr += 1;
                     iteration_count += 1;

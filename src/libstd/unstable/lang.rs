@@ -10,16 +10,22 @@
 
 //! Runtime calls emitted by the compiler.
 
+/*
 use c_str::ToCStr;
 use libc::{c_char, size_t, uintptr_t};
 use rt::borrowck;
+*/
+use libc::{c_char, size_t, uintptr_t};
 
 #[cold]
 #[lang="fail_"]
 pub fn fail_(expr: *c_char, file: *c_char, line: size_t) -> ! {
-    ::rt::begin_unwind_raw(expr, file, line);
+    // XXX bare-metal
+    // ::rt::begin_unwind_raw(expr, file, line);
+    unsafe { ::unstable::intrinsics::abort() }
 }
 
+/*
 #[cold]
 #[lang="fail_bounds_check"]
 pub fn fail_bounds_check(file: *c_char, line: size_t, index: size_t, len: size_t) -> ! {
@@ -79,3 +85,4 @@ pub unsafe fn check_not_borrowed(a: *u8,
                                  line: size_t) {
     borrowck::check_not_borrowed(a, file, line)
 }
+*/

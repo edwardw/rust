@@ -65,12 +65,12 @@ the rest of the rust manuals.
 */
 
 use cmp;
-use num::{Zero, One, Integer, CheckedAdd, CheckedSub, Saturating, ToPrimitive};
+// use num::{Zero, One, Integer, CheckedAdd, CheckedSub, Saturating, ToPrimitive};
 use option::{Option, Some, None};
 use ops::{Add, Mul, Sub};
 use cmp::{Eq, Ord};
 use clone::Clone;
-use uint;
+// use uint;
 use util;
 
 /// Conversion from an `Iterator`
@@ -473,10 +473,12 @@ pub trait Iterator<A> {
     /// let b: ~[int] = a.iter().map(|&x| x).to_owned_vec();
     /// assert!(a == b);
     /// ```
+    /* XXX bare-metal
     #[inline]
     fn to_owned_vec(&mut self) -> ~[A] {
         self.collect()
     }
+    */
 
     /// Loops through `n` iterations, returning the `n`th element of the
     /// iterator.
@@ -735,16 +737,20 @@ pub trait ExactSize<A> : DoubleEndedIterator<A> {
     #[inline]
     fn rposition(&mut self, predicate: |A| -> bool) -> Option<uint> {
         let (lower, upper) = self.size_hint();
-        assert!(upper == Some(lower));
+        // XXX bare-metal
+        // assert!(upper == Some(lower));
         let mut i = lower;
         loop {
             match self.next_back() {
                 None => break,
                 Some(x) => {
+                    /* XXX bare-metal
                     i = match i.checked_sub(&1) {
                         Some(x) => x,
                         None => fail!("rposition: incorrect ExactSize")
                     };
+                    */
+                    i -= 1;
                     if predicate(x) {
                         return Some(i)
                     }
@@ -808,6 +814,7 @@ impl<'a, A, T: DoubleEndedIterator<A>> DoubleEndedIterator<A> for ByRef<'a, T> {
     fn next_back(&mut self) -> Option<A> { self.iter.next_back() }
 }
 
+/*
 /// A trait for iterators over elements which can be added together
 pub trait AdditiveIterator<A> {
     /// Iterates over the entire iterator, summing up all the elements
@@ -859,6 +866,7 @@ impl<A: Mul<A, A> + One, T: Iterator<A>> MultiplicativeIterator<A> for T {
         self.fold(one, |p, x| p * x)
     }
 }
+*/
 
 /// A trait for iterators over elements which can be compared to one another.
 /// The type of each element must ascribe to the `Ord` trait.
@@ -906,6 +914,7 @@ impl<A: Ord, T: Iterator<A>> OrdIterator<A> for T {
     }
 }
 
+/*
 /// A trait for iterators that are cloneable.
 pub trait CloneableIterator {
     /// Repeats an iterator endlessly
@@ -980,6 +989,7 @@ impl<A, T: Clone + RandomAccessIterator<A>> RandomAccessIterator<A> for Cycle<T>
         }
     }
 }
+*/
 
 /// An iterator which strings two iterators together
 #[deriving(Clone)]
@@ -1009,12 +1019,16 @@ impl<A, T: Iterator<A>, U: Iterator<A>> Iterator<A> for Chain<T, U> {
         let (a_lower, a_upper) = self.a.size_hint();
         let (b_lower, b_upper) = self.b.size_hint();
 
+        /* XXX bare-metal
         let lower = a_lower.saturating_add(b_lower);
 
         let upper = match (a_upper, b_upper) {
             (Some(x), Some(y)) => x.checked_add(&y),
             _ => None
         };
+        */
+        let lower = a_lower + b_lower;
+        let upper = None;
 
         (lower, upper)
     }
@@ -1036,7 +1050,9 @@ for Chain<T, U> {
     #[inline]
     fn indexable(&self) -> uint {
         let (a, b) = (self.a.indexable(), self.b.indexable());
-        a.saturating_add(b)
+        // XXX bare-metal
+        // a.saturating_add(b)
+        a + b
     }
 
     #[inline]
@@ -1074,6 +1090,7 @@ impl<A, B, T: Iterator<A>, U: Iterator<B>> Iterator<(A, B)> for Zip<T, U> {
         let (a_lower, a_upper) = self.a.size_hint();
         let (b_lower, b_upper) = self.b.size_hint();
 
+        /* XXX bare-metal
         let lower = cmp::min(a_lower, b_lower);
 
         let upper = match (a_upper, b_upper) {
@@ -1082,6 +1099,9 @@ impl<A, B, T: Iterator<A>, U: Iterator<B>> Iterator<(A, B)> for Zip<T, U> {
             (None, Some(y)) => Some(y),
             (None, None) => None
         };
+        */
+        let lower = 0;
+        let upper = None;
 
         (lower, upper)
     }
@@ -1093,16 +1113,30 @@ for Zip<T, U> {
     fn next_back(&mut self) -> Option<(A, B)> {
         let (a_sz, a_upper) = self.a.size_hint();
         let (b_sz, b_upper) = self.b.size_hint();
-        assert!(a_upper == Some(a_sz));
-        assert!(b_upper == Some(b_sz));
+        // XXX bare-metal
+        // assert!(a_upper == Some(a_sz));
+        // assert!(b_upper == Some(b_sz));
         if a_sz < b_sz {
-            for _ in range(0, b_sz - a_sz) { self.b.next_back(); }
+            // XXX bare-metal
+            // for _ in range(0, b_sz - a_sz) { self.b.next_back(); }
+            let mut i = 0;
+            while i < b_sz - a_sz {
+                self.b.next_back();
+                i += 1;
+            }
         } else if a_sz > b_sz {
-            for _ in range(0, a_sz - b_sz) { self.a.next_back(); }
+            // XXX bare-metal
+            // for _ in range(0, a_sz - b_sz) { self.a.next_back(); }
+            let mut i = 0;
+            while i < a_sz - b_sz {
+                self.b.next_back();
+                i += 1;
+            }
         }
         let (a_sz, _) = self.a.size_hint();
         let (b_sz, _) = self.b.size_hint();
-        assert!(a_sz == b_sz);
+        // XXX bare-metal
+        // assert!(a_sz == b_sz);
         match (self.a.next_back(), self.b.next_back()) {
             (Some(x), Some(y)) => Some((x, y)),
             _ => None
@@ -1114,7 +1148,11 @@ impl<A, B, T: RandomAccessIterator<A>, U: RandomAccessIterator<B>>
 RandomAccessIterator<(A, B)> for Zip<T, U> {
     #[inline]
     fn indexable(&self) -> uint {
-        cmp::min(self.a.indexable(), self.b.indexable())
+        // XXX bare-metal
+        // cmp::min(self.a.indexable(), self.b.indexable())
+        let a = self.a.indexable();
+        let b = self.b.indexable();
+        if (a < b) { a } else { b }
     }
 
     #[inline]
@@ -1297,7 +1335,8 @@ impl<A, T: ExactSize<A>> DoubleEndedIterator<(uint, A)> for Enumerate<T> {
         match self.iter.next_back() {
             Some(a) => {
                 let (lower, upper) = self.iter.size_hint();
-                assert!(upper == Some(lower));
+                // XXX bare-metal
+                // assert!(upper == Some(lower));
                 Some((self.count + lower, a))
             }
             _ => None
@@ -1336,6 +1375,7 @@ impl<A, T: Iterator<A>> Iterator<A> for Peekable<A, T> {
     #[inline]
     fn size_hint(&self) -> (uint, Option<uint>) {
         let (lo, hi) = self.iter.size_hint();
+        /* XXX bare-metal
         if self.peeked.is_some() {
             let lo = lo.saturating_add(1);
             let hi = match hi {
@@ -1346,6 +1386,8 @@ impl<A, T: Iterator<A>> Iterator<A> for Peekable<A, T> {
         } else {
             (lo, hi)
         }
+        */
+        (lo, hi)
     }
 }
 
@@ -1473,12 +1515,14 @@ impl<A, T: Iterator<A>> Iterator<A> for Skip<T> {
     fn size_hint(&self) -> (uint, Option<uint>) {
         let (lower, upper) = self.iter.size_hint();
 
+        /* XXX bare-metal
         let lower = lower.saturating_sub(self.n);
 
         let upper = match upper {
             Some(x) => Some(x.saturating_sub(self.n)),
             None => None
         };
+        */
 
         (lower, upper)
     }
@@ -1487,7 +1531,9 @@ impl<A, T: Iterator<A>> Iterator<A> for Skip<T> {
 impl<A, T: RandomAccessIterator<A>> RandomAccessIterator<A> for Skip<T> {
     #[inline]
     fn indexable(&self) -> uint {
-        self.iter.indexable().saturating_sub(self.n)
+        // XXX bare-metal
+        // self.iter.indexable().saturating_sub(self.n)
+        self.iter.indexable() - self.n
     }
 
     #[inline]
@@ -1522,12 +1568,14 @@ impl<A, T: Iterator<A>> Iterator<A> for Take<T> {
     fn size_hint(&self) -> (uint, Option<uint>) {
         let (lower, upper) = self.iter.size_hint();
 
+        /* XXX bare-metal
         let lower = cmp::min(lower, self.n);
 
         let upper = match upper {
             Some(x) if x < self.n => Some(x),
             _ => Some(self.n)
         };
+        */
 
         (lower, upper)
     }
@@ -1536,7 +1584,11 @@ impl<A, T: Iterator<A>> Iterator<A> for Take<T> {
 impl<A, T: RandomAccessIterator<A>> RandomAccessIterator<A> for Take<T> {
     #[inline]
     fn indexable(&self) -> uint {
-        cmp::min(self.iter.indexable(), self.n)
+        // XXX bare-metal
+        // cmp::min(self.iter.indexable(), self.n)
+        let a = self.iter.indexable();
+        let b = self.n;
+        if a < b { a } else { b }
     }
 
     #[inline]
@@ -1600,6 +1652,7 @@ impl<'a, A, T: Iterator<A>, B, U: Iterator<B>> Iterator<B> for FlatMap<'a, A, T,
 
     #[inline]
     fn size_hint(&self) -> (uint, Option<uint>) {
+        /* XXX bare-metal
         let (flo, fhi) = self.frontiter.as_ref().map_or((0, Some(0)), |it| it.size_hint());
         let (blo, bhi) = self.backiter.as_ref().map_or((0, Some(0)), |it| it.size_hint());
         let lo = flo.saturating_add(blo);
@@ -1607,6 +1660,8 @@ impl<'a, A, T: Iterator<A>, B, U: Iterator<B>> Iterator<B> for FlatMap<'a, A, T,
             ((0, Some(0)), Some(a), Some(b)) => (lo, a.checked_add(&b)),
             _ => (lo, None)
         }
+        */
+        (0, None)
     }
 }
 
@@ -1791,6 +1846,7 @@ impl<'a, A, St> Iterator<A> for Unfold<'a, A, St> {
     }
 }
 
+/*
 /// An infinite iterator starting at `start` and advancing by `step` with each
 /// iteration
 #[deriving(Clone)]
@@ -1817,9 +1873,10 @@ impl<A: Add<A, A> + Clone> Iterator<A> for Counter<A> {
 
     #[inline]
     fn size_hint(&self) -> (uint, Option<uint>) {
-        (uint::max_value, None) // Too bad we can't specify an infinite lower bound
+        // (uint::max_value, None) // Too bad we can't specify an infinite lower bound
     }
 }
+*/
 
 /// An iterator over the range [start, stop)
 #[deriving(Clone, DeepClone)]
@@ -1831,6 +1888,7 @@ pub struct Range<A> {
 
 /// Return an iterator over the range [start, stop)
 #[inline]
+/* XXX bare-metal
 pub fn range<A: Add<A, A> + Ord + Clone + One>(start: A, stop: A) -> Range<A> {
     Range{state: start, stop: stop, one: One::one()}
 }
@@ -1894,6 +1952,7 @@ impl<A: Integer + Ord + Clone + ToPrimitive> DoubleEndedIterator<A> for Range<A>
         }
     }
 }
+*/
 
 /// An iterator over the range [start, stop]
 #[deriving(Clone, DeepClone)]
@@ -1902,6 +1961,7 @@ pub struct RangeInclusive<A> {
     priv done: bool
 }
 
+/*
 /// Return an iterator over the range [start, stop]
 #[inline]
 pub fn range_inclusive<A: Add<A, A> + Ord + Clone + One + ToPrimitive>(start: A, stop: A)
@@ -1957,6 +2017,7 @@ impl<A: Sub<A, A> + Integer + Ord + Clone + ToPrimitive> DoubleEndedIterator<A>
         }
     }
 }
+*/
 
 /// An iterator over the range [start, stop) by `step`. It handles overflow by stopping.
 #[deriving(Clone, DeepClone)]
@@ -1967,6 +2028,7 @@ pub struct RangeStep<A> {
     priv rev: bool
 }
 
+/*
 /// Return an iterator over the range [start, stop) by `step`. It handles overflow by stopping.
 #[inline]
 pub fn range_step<A: CheckedAdd + Ord + Clone + Zero>(start: A, stop: A, step: A) -> RangeStep<A> {
@@ -1989,6 +2051,7 @@ impl<A: CheckedAdd + Ord + Clone> Iterator<A> for RangeStep<A> {
         }
     }
 }
+*/
 
 /// An iterator over the range [start, stop] by `step`. It handles overflow by stopping.
 #[deriving(Clone, DeepClone)]
@@ -2000,6 +2063,7 @@ pub struct RangeStepInclusive<A> {
     priv done: bool
 }
 
+/*
 /// Return an iterator over the range [start, stop] by `step`. It handles overflow by stopping.
 #[inline]
 pub fn range_step_inclusive<A: CheckedAdd + Ord + Clone + Zero>(start: A, stop: A,
@@ -2024,6 +2088,7 @@ impl<A: CheckedAdd + Ord + Clone + Eq> Iterator<A> for RangeStepInclusive<A> {
         }
     }
 }
+*/
 
 /// An iterator that repeats an element endlessly
 #[deriving(Clone, DeepClone)]
@@ -2039,6 +2104,7 @@ impl<A: Clone> Repeat<A> {
     }
 }
 
+/*
 impl<A: Clone> Iterator<A> for Repeat<A> {
     #[inline]
     fn next(&mut self) -> Option<A> { self.idx(0) }
@@ -2057,6 +2123,7 @@ impl<A: Clone> RandomAccessIterator<A> for Repeat<A> {
     #[inline]
     fn idx(&self, _: uint) -> Option<A> { Some(self.element.clone()) }
 }
+*/
 
 /// Functions for lexicographical ordering of sequences.
 ///

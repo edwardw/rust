@@ -13,17 +13,23 @@
 use prelude::*;
 use libc::uintptr_t;
 
+/*
 pub mod dynamic_lib;
 
 pub mod finally;
+*/
 pub mod intrinsics;
+/*
 pub mod simd;
+*/
 #[cfg(not(test))]
 pub mod lang;
+/*
 pub mod sync;
 pub mod mutex;
 pub mod raw;
 pub mod stack;
+*/
 
 /**
 
@@ -33,10 +39,12 @@ for it to terminate.
 The executing thread has no access to a task pointer and will be using
 a normal large stack.
 */
+/*
 pub fn run_in_bare_thread(f: proc()) {
     use rt::thread::Thread;
     Thread::start(f).join()
 }
+*/
 
 #[test]
 fn test_run_in_bare_thread() {
