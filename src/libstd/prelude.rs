@@ -34,6 +34,7 @@ pub use ops::{Add, Sub, Mul, Div, Rem, Neg, Not};
 pub use ops::{BitAnd, BitOr, BitXor};
 pub use ops::{Drop};
 pub use ops::{Shl, Shr, Index};
+/*
 pub use option::{Option, Some, None};
 pub use result::{Result, Ok, Err};
 
@@ -51,7 +52,9 @@ pub use char::Char;
 pub use clone::{Clone, DeepClone};
 pub use cmp::{Eq, Ord, TotalEq, TotalOrd, Ordering, Less, Equal, Greater, Equiv};
 pub use container::{Container, Mutable, Map, MutableMap, Set, MutableSet};
+*/
 pub use default::Default;
+/*
 pub use from_str::FromStr;
 pub use hash::Hash;
 pub use iter::{FromIterator, Extendable};
@@ -92,3 +95,4 @@ pub use gc::GC;
 /// Disposes of a value.
 #[inline]
 pub fn drop<T>(_x: T) { }
+*/
