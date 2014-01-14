@@ -42,11 +42,15 @@ pub mod mem;
 #[unstable]
 pub mod unstable;
 
+#[unstable]
+pub mod rt;
+
 #[doc(hidden)]
 mod std {
     pub use clone;
     pub use cmp;
     pub use kinds;
     pub use option;
+    pub use rt;
     pub use unstable;
 }

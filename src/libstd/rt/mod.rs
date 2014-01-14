@@ -57,6 +57,7 @@ Several modules in `core` are clients of `rt`:
 // XXX: this should not be here.
 #[allow(missing_doc)];
 
+/*
 use any::Any;
 use option::Option;
 use result::Result;
@@ -83,10 +84,12 @@ pub mod shouldnt_be_public {
 
 // Internal macros used by the runtime.
 mod macros;
+*/
 
 /// The global (exchange) heap.
 pub mod global_heap;
 
+/*
 /// Implementations of language-critical runtime features like @.
 pub mod task;
 
@@ -190,3 +193,4 @@ pub unsafe fn cleanup() {
     args::cleanup();
     local_ptr::cleanup();
 }
+*/

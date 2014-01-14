@@ -29,7 +29,8 @@ pub fn get_box_size(body_size: uint, body_align: uint) -> uint {
 // of two.
 #[inline]
 fn align_to(size: uint, align: uint) -> uint {
-    assert!(align != 0);
+    // XXX bare-metal
+    // assert!(align != 0);
     (size + align - 1) & !(align - 1)
 }
 
@@ -74,7 +75,8 @@ pub unsafe fn closure_exchange_malloc(td: *c_char, size: uintptr_t) -> *c_char {
     let td = td as *TyDesc;
     let size = size as uint;
 
-    assert!(td.is_not_null());
+    // XXX bare-metal
+    // assert!(td.is_not_null());
 
     let total_size = get_box_size(size, (*td).align);
     let p = malloc_raw(total_size);
