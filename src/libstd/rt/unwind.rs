@@ -55,6 +55,7 @@
 //
 // Currently Rust uses unwind runtime provided by libgcc.
 
+/*
 use any::{Any, AnyRefExt};
 use c_str::CString;
 use cast;
@@ -468,4 +469,39 @@ pub fn begin_unwind<M: Any + Send>(msg: M, file: &'static str, line: uint) -> ! 
         let task: *mut Task = Local::unsafe_borrow();
         (*task).unwinder.begin_unwind(msg);
     }
+}
+*/
+
+
+// XXX bare-metal
+// Revisit the implementation later
+use cast;
+use any::Any;
+use kinds::Send;
+use container::Container;
+use libc::{c_char, size_t};
+use str;
+use ptr;
+use vec::ImmutableVector;
+
+pub fn begin_unwind_raw(msg: *c_char, file: *c_char, line: size_t) -> ! {
+    #[inline]
+    fn static_char_ptr(p: *c_char) -> &'static str {
+        let buf: &[u8] = unsafe {
+            cast::transmute((p, ptr::position(p, |c| *c == 0) + 1))
+        };
+        let buf = buf.slice_to(buf.len()-1); // chop off the trailing NUL
+        unsafe {
+            cast::transmute::<&str, &'static str>(str::from_utf8(buf))
+        }
+    }
+
+    let msg = static_char_ptr(msg);
+    let file = static_char_ptr(file);
+
+    begin_unwind(msg, file, line as uint)
+}
+
+pub fn begin_unwind<M: Any + Send>(_msg: M, _file: &'static str, _line: uint) -> ! {
+    unsafe { ::std::unstable::intrinsics::abort(); }
 }

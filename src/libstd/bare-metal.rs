@@ -9,6 +9,8 @@
 
 pub mod prelude;
 
+/* Primitive types */
+
 #[path = "num/float_macros.rs"] mod float_macros;
 #[path = "num/int_macros.rs"]   mod int_macros;
 #[path = "num/uint_macros.rs"]  mod uint_macros;
@@ -35,6 +37,7 @@ pub mod vec;
 pub mod str;
 
 pub mod ptr;
+pub mod owned;
 pub mod borrow;
 
 /* Core language traits */
@@ -59,14 +62,29 @@ pub mod any;
 
 pub mod option;
 
+/* Tasks and communication */
+
+pub mod local_data;
+
 /* Runtime and platform support */
 
 #[unstable]
 pub mod libc;
 pub mod cast;
+pub mod io;
+pub mod fmt;
 #[deprecated]
+pub mod condition;
+pub mod logging;
 pub mod util;
 pub mod mem;
+
+/* Unsupported interfaces */
+
+#[unstable]
+pub mod repr;
+#[unstable]
+pub mod reflect;
 
 // Private APIs
 #[unstable]
@@ -85,7 +103,12 @@ pub mod rt;
 mod std {
     pub use clone;
     pub use cmp;
+    pub use condition;
+    pub use fmt;
+    pub use io;
     pub use kinds;
+    pub use local_data;
+    pub use logging;
     pub use option;
     pub use rt;
     pub use str;

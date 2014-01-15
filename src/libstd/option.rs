@@ -45,14 +45,12 @@ use default::Default;
 // use fmt;
 use iter::{Iterator, DoubleEndedIterator, FromIterator, ExactSize};
 use kinds::Send;
-// use str::OwnedStr;
-// use to_str::ToStr;
+use str::OwnedStr;
+use to_str::ToStr;
 use util;
 
 /// The option type
-/// XXX bare-metal
-// #[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd, ToStr)]
-#[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd)]
+#[deriving(Clone, DeepClone, Eq, Ord, TotalEq, TotalOrd, ToStr)]
 pub enum Option<T> {
     /// No value
     None,

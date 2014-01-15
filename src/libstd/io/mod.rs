@@ -290,13 +290,13 @@ Out of scope
 
 use cast;
 use char::Char;
-use condition::Guard;
+// use condition::Guard;
 use container::Container;
 use int;
 use iter::Iterator;
 use option::{Option, Some, None};
-use path::Path;
-use result::{Ok, Err, Result};
+// use path::Path;
+// use result::{Ok, Err, Result};
 use str;
 use str::{StrSlice, OwnedStr};
 use to_str::ToStr;
@@ -305,6 +305,7 @@ use unstable::finally::Finally;
 use vec::{OwnedVector, MutableVector, ImmutableVector, OwnedCopyableVector};
 use vec;
 
+/* XXX bare-metal
 // Reexports
 pub use self::stdio::stdin;
 pub use self::stdio::stdout;
@@ -335,10 +336,12 @@ pub mod process;
 
 /// Synchronous, non-blocking network I/O.
 pub mod net;
+*/
 
 /// Readers and Writers for memory buffers and strings.
 pub mod mem;
 
+/* XXX bare-metal
 /// Non-blocking access to stdin, stdout, stderr
 pub mod stdio;
 
@@ -347,10 +350,12 @@ mod option;
 
 /// Basic stream compression. XXX: Belongs with other flate code
 pub mod flate;
+*/
 
 /// Extension traits
 pub mod extensions;
 
+/* XXX bare-metal
 /// Basic Timer
 pub mod timer;
 
@@ -365,6 +370,7 @@ pub mod util;
 
 /// Adapatation of Chan/Port types to a Writer/Reader type.
 pub mod comm_adapters;
+*/
 
 /// The default buffer size for various I/O operations
 static DEFAULT_BUF_SIZE: uint = 1024 * 64;
@@ -450,6 +456,7 @@ condition! {
 
 /// Helper for wrapper calls where you want to
 /// ignore any io_errors that might be raised
+/* XXX bare-metal
 pub fn ignore_io_error() -> Guard<'static,IoError,()> {
     io_error::cond.trap(|_| {
         // just swallow the error.. downstream users
@@ -473,6 +480,7 @@ pub fn result<T>(cb: || -> T) -> Result<T, IoError> {
         None => Ok(ret),
     }
 }
+*/
 
 pub trait Reader {
 
@@ -1298,6 +1306,7 @@ pub fn placeholder_error() -> IoError {
     }
 }
 
+/* XXX bare-metal
 /// A mode specifies how a file should be opened or created. These modes are
 /// passed to `File::open_mode` and are used to control where the file is
 /// positioned when it is initially opened.
@@ -1415,3 +1424,4 @@ pub static UserExec: FilePermission = UserDir;
 
 /// A mask for all possible permission bits
 pub static AllPermissions: FilePermission = 0x1ff;
+*/

@@ -96,15 +96,15 @@ start, print out all modules registered for logging, and then exit.
 */
 
 use fmt;
-use io::buffered::LineBufferedWriter;
-use io;
-use io::Writer;
-use ops::Drop;
+// use io::buffered::LineBufferedWriter;
+// use io;
+// use io::Writer;
+// use ops::Drop;
 use option::{Some, None, Option};
-use prelude::drop;
-use rt::local::Local;
-use rt::task::Task;
-use util;
+// use prelude::drop;
+// use rt::local::Local;
+// use rt::task::Task;
+// use util;
 
 /// Debug log level
 pub static DEBUG: u32 = 4;
@@ -124,6 +124,7 @@ pub trait Logger {
     fn log(&mut self, level: u32, args: &fmt::Arguments);
 }
 
+/*
 struct DefaultLogger {
     handle: LineBufferedWriter<io::stdio::StdWriter>,
 }
@@ -140,7 +141,9 @@ impl Drop for DefaultLogger {
         self.handle.flush();
     }
 }
+*/
 
+/* XXX bare-metal we use a global logger
 /// This function is called directly by the compiler when using the logging
 /// macros. This function does not take into account whether the log level
 /// specified is active or not, it will always log something if this method is
@@ -176,4 +179,22 @@ pub fn log(level: u32, args: &fmt::Arguments) {
 pub fn set_logger(logger: ~Logger) -> Option<~Logger> {
     let mut task = Local::borrow(None::<Task>);
     util::replace(&mut task.get().logger, Some(logger))
+}
+*/
+pub static mut LOGGER: Option<~Logger> = None;
+
+pub fn log(level: u32, args: &fmt::Arguments) {
+    unsafe {
+        if LOGGER.is_some() {
+            LOGGER.get_mut_ref().log(level, args);
+        }
+    }
+}
+
+pub fn set_logger(logger: ~Logger) -> Option<~Logger> {
+    unsafe {
+        let l = LOGGER;
+        LOGGER = Some(logger);
+        l
+    }
 }

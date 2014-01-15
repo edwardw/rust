@@ -114,8 +114,9 @@ impl<T, U> Condition<T, U> {
     /// ```
     pub fn trap<'a>(&'a self, h: 'a |T| -> U) -> Trap<'a, T, U> {
         let h: Closure = unsafe { ::cast::transmute(h) };
-        let prev = local_data::get(self.key, |k| k.map(|x| *x));
-        let h = @Handler { handle: h, prev: prev };
+        // XXX bare-metal
+        // let prev = local_data::get(self.key, |k| k.map(|x| *x));
+        let h = @Handler { handle: h, prev: None };
         Trap { cond: self, handler: h }
     }
 
@@ -142,25 +143,27 @@ impl<T, U> Condition<T, U> {
     /// Performs the same functionality as `raise`, except that when no handler
     /// is found the `default` argument is called instead of failing the task.
     pub fn raise_default(&self, t: T, default: || -> U) -> U {
-        match local_data::pop(self.key) {
-            None => {
-                debug!("Condition.raise: found no handler");
-                default()
-            }
-            Some(handler) => {
-                debug!("Condition.raise: found handler");
-                match handler.prev {
-                    None => {}
-                    Some(hp) => local_data::set(self.key, hp)
-                }
-                let handle : |T| -> U = unsafe {
-                    ::cast::transmute(handler.handle)
-                };
-                let u = handle(t);
-                local_data::set(self.key, handler);
-                u
-            }
-        }
+        // XXX bare-metal
+        // match local_data::pop(self.key) {
+        //     None => {
+        //         debug!("Condition.raise: found no handler");
+        //         default()
+        //     }
+        //     Some(handler) => {
+        //         debug!("Condition.raise: found handler");
+        //         match handler.prev {
+        //             None => {}
+        //             Some(hp) => local_data::set(self.key, hp)
+        //         }
+        //         let handle : |T| -> U = unsafe {
+        //             ::cast::transmute(handler.handle)
+        //         };
+        //         let u = handle(t);
+        //         local_data::set(self.key, handler);
+        //         u
+        //     }
+        // }
+        default()
     }
 }
 
@@ -194,7 +197,7 @@ impl<'a, T, U> Trap<'a, T, U> {
     pub fn inside<V>(&self, inner: 'a || -> V) -> V {
         let _g = Guard { cond: self.cond };
         debug!("Trap: pushing handler to TLS");
-        local_data::set(self.cond.key, self.handler);
+        // local_data::set(self.cond.key, self.handler);
         inner()
     }
 
@@ -206,7 +209,7 @@ impl<'a, T, U> Trap<'a, T, U> {
             cond: self.cond
         };
         debug!("Guard: pushing handler to TLS");
-        local_data::set(self.cond.key, self.handler);
+        // local_data::set(self.cond.key, self.handler);
         guard
     }
 }
@@ -222,14 +225,15 @@ pub struct Guard<'a, T, U> {
 impl<'a, T, U> Drop for Guard<'a, T, U> {
     fn drop(&mut self) {
         debug!("Guard: popping handler from TLS");
-        let curr = local_data::pop(self.cond.key);
-        match curr {
-            None => {}
-            Some(h) => match h.prev {
-                None => {}
-                Some(hp) => local_data::set(self.cond.key, hp)
-            }
-        }
+        // XXX bare-metal
+        // let curr = local_data::pop(self.cond.key);
+        // match curr {
+        //     None => {}
+        //     Some(h) => match h.prev {
+        //         None => {}
+        //         Some(hp) => local_data::set(self.cond.key, hp)
+        //     }
+        // }
     }
 }
 

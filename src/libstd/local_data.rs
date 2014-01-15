@@ -43,7 +43,7 @@ local_data::get(key_vector, |opt| assert_eq!(*opt.unwrap(), ~[4]));
 use cast;
 use libc;
 use prelude::*;
-use rt::task::{Task, LocalStorage};
+// use rt::task::{Task, LocalStorage};
 use util;
 
 /**
@@ -90,6 +90,7 @@ impl<T: 'static> LocalData for T {}
 pub type Map = ~[Option<(*libc::c_void, TLSValue, LoanState)>];
 type TLSValue = ~LocalData;
 
+/* XXX bare-metal
 // Gets the map from the runtime. Lazily initialises if not done so already.
 unsafe fn get_local_map() -> &mut Map {
     use rt::local::Local;
@@ -112,6 +113,7 @@ unsafe fn get_local_map() -> &mut Map {
         }
     }
 }
+*/
 
 #[deriving(Eq)]
 enum LoanState {
@@ -137,6 +139,7 @@ fn key_to_key_value<T: 'static>(key: Key<T>) -> *libc::c_void {
 ///
 /// A runtime assertion will be triggered it removal of TLS value is attempted
 /// while the value is still loaned out via `get` or `get_mut`.
+/* XXX bare-metal
 pub fn pop<T: 'static>(key: Key<T>) -> Option<T> {
     let map = unsafe { get_local_map() };
     let key_value = key_to_key_value(key);
@@ -279,11 +282,13 @@ fn get_with<T:'static,
         }
     }
 }
+*/
 
 fn abort() -> ! {
     unsafe { libc::abort() }
 }
 
+/* XXX bare-metal
 /// Inserts a value into task local storage. If the key is already present in
 /// TLS, then the previous value is removed and replaced with the provided data.
 ///
@@ -345,6 +350,7 @@ pub fn modify<T: 'static>(key: Key<T>, f: |Option<T>| -> Option<T>) {
         None => {}
     }
 }
+*/
 
 #[cfg(test)]
 mod tests {

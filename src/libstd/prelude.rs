@@ -64,12 +64,10 @@ pub use num::{Bitwise, BitCount, Bounded, Integer, Real};
 pub use num::{Num, NumCast, CheckedAdd, CheckedSub, CheckedMul};
 pub use num::{Orderable, Signed, Unsigned, Round};
 pub use num::{Primitive, Int, Float, ToStrRadix, ToPrimitive, FromPrimitive};
-/*
-pub use path::{GenericPath, Path, PosixPath, WindowsPath};
+// pub use path::{GenericPath, Path, PosixPath, WindowsPath};
 pub use ptr::RawPtr;
 pub use io::{Buffer, Writer, Reader, Seek};
-pub use send_str::{SendStr, SendStrOwned, SendStrStatic, IntoSendStr};
-*/
+// pub use send_str::{SendStr, SendStrOwned, SendStrStatic, IntoSendStr};
 pub use str::{Str, StrVector, StrSlice, OwnedStr};
 pub use to_bytes::IterBytes;
 pub use to_str::{ToStr, IntoStr};
@@ -95,8 +93,8 @@ pub use task::spawn;
 // Reexported statics
 #[cfg(not(test))]
 pub use gc::GC;
+*/
 
 /// Disposes of a value.
 #[inline]
 pub fn drop<T>(_x: T) { }
-*/

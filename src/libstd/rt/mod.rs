@@ -70,10 +70,12 @@ use self::task::{Task, BlockedTask};
 // Perhaps this shouldn't be a `pub use` though and there should be another
 // method...
 pub use self::util::default_sched_threads;
+*/
 
 // Export unwinding facilities used by the failure macros
 pub use self::unwind::{begin_unwind, begin_unwind_raw};
 
+/*
 // XXX: these probably shouldn't be public...
 #[doc(hidden)]
 pub mod shouldnt_be_public {
@@ -81,10 +83,10 @@ pub mod shouldnt_be_public {
     #[cfg(not(windows), not(target_os = "android"))]
     pub use super::local_ptr::compiled::RT_TLS_PTR;
 }
+*/
 
 // Internal macros used by the runtime.
 mod macros;
-*/
 
 /// The global (exchange) heap.
 pub mod global_heap;
@@ -122,10 +124,12 @@ mod local_ptr;
 
 /// Bindings to pthread/windows thread-local storage.
 mod thread_local_storage;
+*/
 
 /// Stack unwinding
 pub mod unwind;
 
+/*
 /// Just stuff
 mod util;
 

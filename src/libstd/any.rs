@@ -20,12 +20,10 @@
 //! value. `~Any` adds the `move` method, which will unwrap a `~T` from the object.  See the
 //! extension traits (`*Ext`) for the full details.
 
-/*
 use cast::transmute;
 use option::{Option, Some, None};
-use result::{Result, Ok, Err};
+// use result::{Result, Ok, Err};
 use to_str::ToStr;
-*/
 use unstable::intrinsics::TypeId;
 use unstable::intrinsics;
 use util::Void;
@@ -64,7 +62,6 @@ impl<T: 'static> Any for T {
     }
 }
 
-/*
 ///////////////////////////////////////////////////////////////////////////////
 // Extension methods for Any trait objects.
 // Implemented as three extension traits so that generics work.
@@ -121,6 +118,7 @@ impl<'a> AnyMutRefExt<'a> for &'a mut Any {
     }
 }
 
+/*
 /// Extension methods for a owning `Any` trait object
 pub trait AnyOwnExt {
     /// Returns the boxed value if it is of type `T`, or
@@ -146,6 +144,7 @@ impl AnyOwnExt for ~Any {
         }
     }
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // Trait implementations
@@ -405,4 +404,3 @@ mod tests {
         assert!(b.move::<~uint>().is_err());
     }
 }
-*/
