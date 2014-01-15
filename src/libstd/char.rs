@@ -14,7 +14,7 @@ use cast::transmute;
 use option::{None, Option, Some};
 use iter::{Iterator, range_step};
 use str::StrSlice;
-// use unicode::{derived_property, property, general_category, decompose};
+use unicode::{derived_property, property, general_category, decompose};
 use to_str::ToStr;
 use str;
 
@@ -81,38 +81,25 @@ pub fn from_u32(i: u32) -> Option<char> {
 
 /// Returns whether the specified character is considered a unicode alphabetic
 /// character
-// XXX bare-metal
-// pub fn is_alphabetic(c: char) -> bool   { derived_property::Alphabetic(c) }
-pub fn is_alphabetic(c: char) -> bool {
-    ('a' <= c && c <= 'z')
-    || ('A' <= c && c <= 'Z')
-}
+pub fn is_alphabetic(c: char) -> bool   { derived_property::Alphabetic(c) }
 #[allow(missing_doc)]
-// XXX bare-metal
-// pub fn is_XID_start(c: char) -> bool    { derived_property::XID_Start(c) }
-pub fn is_XID_start(c: char) -> bool    { false }
+pub fn is_XID_start(c: char) -> bool    { derived_property::XID_Start(c) }
 #[allow(missing_doc)]
-// XXX bare-metal
-// pub fn is_XID_continue(c: char) -> bool { derived_property::XID_Continue(c) }
-pub fn is_XID_continue(c: char) -> bool { false }
+pub fn is_XID_continue(c: char) -> bool { derived_property::XID_Continue(c) }
 
 ///
 /// Indicates whether a character is in lower case, defined
 /// in terms of the Unicode Derived Core Property 'Lowercase'.
 ///
 #[inline]
-// XXX bare-metal
-// pub fn is_lowercase(c: char) -> bool { derived_property::Lowercase(c) }
-pub fn is_lowercase(c: char) -> bool { 'a' <= c && c <= 'z' }
+pub fn is_lowercase(c: char) -> bool { derived_property::Lowercase(c) }
 
 ///
 /// Indicates whether a character is in upper case, defined
 /// in terms of the Unicode Derived Core Property 'Uppercase'.
 ///
 #[inline]
-// XXX bare-metal
-// pub fn is_uppercase(c: char) -> bool { derived_property::Uppercase(c) }
-pub fn is_uppercase(c: char) -> bool { 'A' <= c && c <= 'Z' }
+pub fn is_uppercase(c: char) -> bool { derived_property::Uppercase(c) }
 
 ///
 /// Indicates whether a character is whitespace. Whitespace is defined in
@@ -121,12 +108,9 @@ pub fn is_uppercase(c: char) -> bool { 'A' <= c && c <= 'Z' }
 #[inline]
 pub fn is_whitespace(c: char) -> bool {
     // As an optimization ASCII whitespace characters are checked separately
-    // XXX bare-metal
-    // c == ' '
-    //     || ('\x09' <= c && c <= '\x0d')
-    //     || property::White_Space(c)
     c == ' '
         || ('\x09' <= c && c <= '\x0d')
+        || property::White_Space(c)
 }
 
 ///
@@ -136,12 +120,10 @@ pub fn is_whitespace(c: char) -> bool {
 ///
 #[inline]
 pub fn is_alphanumeric(c: char) -> bool {
-    // XXX bare-metal
-    // derived_property::Alphabetic(c)
-    //     || general_category::Nd(c)
-    //     || general_category::Nl(c)
-    //     || general_category::No(c)
-    is_alphabetic(c) || ('0' <= c && c<= '9')
+    derived_property::Alphabetic(c)
+        || general_category::Nd(c)
+        || general_category::Nl(c)
+        || general_category::No(c)
 }
 
 ///
@@ -150,20 +132,14 @@ pub fn is_alphanumeric(c: char) -> bool {
 /// 'Cc'.
 ///
 #[inline]
-// XXX bare-metal
-// pub fn is_control(c: char) -> bool { general_category::Cc(c) }
-pub fn is_control(c: char) -> bool {
-    !(is_alphanumeric(c) || is_whitespace(c))
-}
+pub fn is_control(c: char) -> bool { general_category::Cc(c) }
 
 /// Indicates whether the character is numeric (Nd, Nl, or No)
 #[inline]
 pub fn is_digit(c: char) -> bool {
-    // XXX bare-metal
-    // general_category::Nd(c)
-    //     || general_category::Nl(c)
-    //     || general_category::No(c)
-    '0' <= c && c <= '9'
+    general_category::Nd(c)
+        || general_category::Nl(c)
+        || general_category::No(c)
 }
 
 ///
@@ -284,7 +260,6 @@ fn decompose_hangul(s: char, f: |char|) {
     }
 }
 
-/* XXX bare-metal
 /// Returns the canonical decomposition of a character.
 pub fn decompose_canonical(c: char, f: |char|) {
     if (c as uint) < S_BASE || (c as uint) >= (S_BASE + S_COUNT) {
@@ -302,7 +277,6 @@ pub fn decompose_compatible(c: char, f: |char|) {
         decompose_hangul(c, f);
     }
 }
-*/
 
 ///
 /// Return the hexadecimal unicode escape of a char.

@@ -74,6 +74,7 @@ pub mod unstable;
 
 /* For internal use, not exported */
 
+mod unicode;
 #[path = "num/cmath.rs"]
 mod cmath;
 
