@@ -10,10 +10,11 @@
 
 //! The local, garbage collected heap
 
-use cast;
-use iter::Iterator;
+// use cast;
+// use iter::Iterator;
 use libc::{c_void, uintptr_t};
 use libc;
+/*
 use mem;
 use ops::Drop;
 use option::{Option, None, Some};
@@ -282,7 +283,9 @@ impl Drop for MemoryRegion {
         rtassert!(self.allocations.iter().all(|s| s.is_null()));
     }
 }
+*/
 
+/* XXX bare-metal
 pub unsafe fn local_malloc(td: *libc::c_char, size: libc::uintptr_t) -> *libc::c_char {
     // XXX: Unsafe borrow for speed. Lame.
     let task: Option<*mut Task> = Local::try_unsafe_borrow();
@@ -293,7 +296,12 @@ pub unsafe fn local_malloc(td: *libc::c_char, size: libc::uintptr_t) -> *libc::c
         None => rtabort!("local malloc outside of task")
     }
 }
+*/
+pub unsafe fn local_malloc(_: *libc::c_char, size: libc::uintptr_t) -> *libc::c_char {
+    ::std::rt::global_heap::malloc_raw(size) as *libc::c_char
+}
 
+/* XXX bare-metal
 // A little compatibility function
 pub unsafe fn local_free(ptr: *libc::c_char) {
     // XXX: Unsafe borrow for speed. Lame.
@@ -305,7 +313,12 @@ pub unsafe fn local_free(ptr: *libc::c_char) {
         None => rtabort!("local free outside of task")
     }
 }
+*/
+pub unsafe fn local_free(ptr: *libc::c_char) {
+    ::std::rt::global_heap::exchange_free(ptr);
+}
 
+/*
 pub fn live_allocs() -> *mut Box {
     let mut task = Local::borrow(None::<Task>);
     task.get().heap.live_allocs
@@ -325,3 +338,4 @@ mod bench {
         bh.iter(|| { @[10, ..1000]; });
     }
 }
+*/

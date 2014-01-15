@@ -188,7 +188,9 @@ pub fn with_capacity<T>(capacity: uint) -> ~[T] {
             let alloc = capacity * mem::nonzero_size_of::<T>();
             let size = alloc + mem::size_of::<Vec<()>>();
             if alloc / mem::nonzero_size_of::<T>() != capacity || size < alloc {
-                fail!("vector size is too large: {}", capacity);
+                // XXX bare-metal
+                // fail!("vector size is too large: {}", capacity);
+                unsafe { ::std::unstable::intrinsics::abort() }
             }
             let ptr = malloc_raw(size) as *mut Vec<()>;
             (*ptr).alloc = alloc;
@@ -396,6 +398,7 @@ pub fn unzip<T, U, V: Iterator<(T, U)>>(mut iter: V) -> (~[T], ~[U]) {
     (ts, us)
 }
 
+/*
 /// An Iterator that yields the element swaps needed to produce
 /// a sequence of all possible permutations for an indexed sequence of
 /// elements. Each permutation is only a single swap apart.
@@ -499,6 +502,7 @@ impl<T: Clone> Iterator<~[T]> for Permutations<T> {
         }
     }
 }
+*/
 
 /// An iterator over the (overlapping) slices of length `size` within
 /// a vector.
@@ -1023,8 +1027,9 @@ pub trait ImmutableVector<'a, T> {
 impl<'a,T> ImmutableVector<'a, T> for &'a [T] {
     #[inline]
     fn slice(&self, start: uint, end: uint) -> &'a [T] {
-        assert!(start <= end);
-        assert!(end <= self.len());
+        // XXX bare-metal
+        // assert!(start <= end);
+        // assert!(end <= self.len());
         unsafe {
             cast::transmute(Slice {
                     data: self.as_ptr().offset(start as int),
@@ -1096,13 +1101,15 @@ impl<'a,T> ImmutableVector<'a, T> for &'a [T] {
 
     #[inline]
     fn windows(self, size: uint) -> WindowIter<'a, T> {
-        assert!(size != 0);
+        // XXX bare-metal
+        // assert!(size != 0);
         WindowIter { v: self, size: size }
     }
 
     #[inline]
     fn chunks(self, size: uint) -> ChunkIter<'a, T> {
-        assert!(size != 0);
+        // XXX bare-metal
+        // assert!(size != 0);
         ChunkIter { v: self, size: size }
     }
 
@@ -1113,7 +1120,9 @@ impl<'a,T> ImmutableVector<'a, T> for &'a [T] {
 
     #[inline]
     fn head(&self) -> &'a T {
-        if self.len() == 0 { fail!("head: empty vector") }
+        // XXX bare-metal
+        // if self.len() == 0 { fail!("head: empty vector") }
+        if self.len() == 0 { unsafe { ::std::unstable::intrinsics::abort() } }
         &self[0]
     }
 
@@ -1140,7 +1149,9 @@ impl<'a,T> ImmutableVector<'a, T> for &'a [T] {
 
     #[inline]
     fn last(&self) -> &'a T {
-        if self.len() == 0 { fail!("last: empty vector") }
+        // XXX bare-metal
+        // if self.len() == 0 { fail!("last: empty vector") }
+        if self.len() == 0 { unsafe { ::std::unstable::intrinsics::abort() } }
         &self[self.len() - 1]
     }
 
@@ -1266,6 +1277,7 @@ impl<'a, T: TotalOrd> ImmutableTotalOrdVector<T> for &'a [T] {
     }
 }
 
+/*
 /// Extension methods for vectors containing `Clone` elements.
 pub trait ImmutableCopyableVector<T> {
     /**
@@ -1304,6 +1316,7 @@ impl<'a,T:Clone> ImmutableCopyableVector<T> for &'a [T] {
     }
 
 }
+*/
 
 /// Extension methods for owned vectors.
 pub trait OwnedVector<T> {
@@ -1487,14 +1500,19 @@ impl<T> OwnedVector<T> for ~[T] {
             unsafe {
                 let td = get_tydesc::<T>();
                 if owns_managed::<T>() {
-                    let ptr: *mut *mut Box<Vec<()>> = cast::transmute(self);
-                    ::at_vec::raw::reserve_raw(td, ptr, n);
+                    // XXX bare-metal
+                    // It makes no sense for bare metal to support owns managed,
+                    // a assert false should do.
+                    // let ptr: *mut *mut Box<Vec<()>> = cast::transmute(self);
+                    // ::at_vec::raw::reserve_raw(td, ptr, n);
                 } else {
                     let ptr: *mut *mut Vec<()> = cast::transmute(self);
                     let alloc = n * mem::nonzero_size_of::<T>();
                     let size = alloc + mem::size_of::<Vec<()>>();
                     if alloc / mem::nonzero_size_of::<T>() != n || size < alloc {
-                        fail!("vector size is too large: {}", n);
+                        // XXX bare-metal
+                        // fail!("vector size is too large: {}", n);
+                        unsafe { ::std::unstable::intrinsics::abort(); }
                     }
                     *ptr = realloc_raw(*ptr as *mut c_void, size)
                            as *mut Vec<()>;
@@ -1513,7 +1531,9 @@ impl<T> OwnedVector<T> for ~[T] {
     fn reserve_additional(&mut self, n: uint) {
         if self.capacity() - self.len() < n {
             match self.len().checked_add(&n) {
-                None => fail!("vec::reserve_additional: `uint` overflow"),
+                // XXX bare-metal
+                // None => fail!("vec::reserve_additional: `uint` overflow"),
+                None => unsafe { ::std::unstable::intrinsics::abort() },
                 Some(new_cap) => self.reserve_at_least(new_cap)
             }
         }
@@ -1635,7 +1655,8 @@ impl<T> OwnedVector<T> for ~[T] {
 
     fn insert(&mut self, i: uint, x: T) {
         let len = self.len();
-        assert!(i <= len);
+        // XXX bare-metal
+        // assert!(i <= len);
         // space for the new element
         self.reserve_additional(1);
 
@@ -1656,7 +1677,9 @@ impl<T> OwnedVector<T> for ~[T] {
     fn remove(&mut self, i: uint) -> T {
         match self.remove_opt(i) {
             Some(t) => t,
-            None => fail!("remove: the len is {} but the index is {}", self.len(), i)
+            // XXX bare-metal
+            // None => fail!("remove: the len is {} but the index is {}", self.len(), i)
+            None => unsafe { ::std::unstable::intrinsics::abort() }
         }
     }
 
@@ -1683,7 +1706,9 @@ impl<T> OwnedVector<T> for ~[T] {
     fn swap_remove(&mut self, index: uint) -> T {
         let ln = self.len();
         if index >= ln {
-            fail!("vec::swap_remove - index {} >= length {}", index, ln);
+            // XXX bare-metal
+            // fail!("vec::swap_remove - index {} >= length {}", index, ln);
+            unsafe { ::std::unstable::intrinsics::abort(); }
         }
         if index < ln - 1 {
             self.swap(index, ln - 1);
@@ -1692,7 +1717,8 @@ impl<T> OwnedVector<T> for ~[T] {
     }
     fn truncate(&mut self, newlen: uint) {
         let oldlen = self.len();
-        assert!(newlen <= oldlen);
+        // XXX bare-metal
+        // assert!(newlen <= oldlen);
 
         unsafe {
             let p = self.as_mut_ptr();
@@ -2310,8 +2336,9 @@ impl<'a,T> MutableVector<'a, T> for &'a mut [T] {
     fn as_mut_slice(self) -> &'a mut [T] { self }
 
     fn mut_slice(self, start: uint, end: uint) -> &'a mut [T] {
-        assert!(start <= end);
-        assert!(end <= self.len());
+        // XXX bare-metal
+        // assert!(start <= end);
+        // assert!(end <= self.len());
         unsafe {
             cast::transmute(Slice {
                     data: self.as_mut_ptr().offset(start as int) as *T,
@@ -2368,7 +2395,8 @@ impl<'a,T> MutableVector<'a, T> for &'a mut [T] {
 
     #[inline]
     fn mut_chunks(self, chunk_size: uint) -> MutChunkIter<'a, T> {
-        assert!(chunk_size > 0);
+        // XXX bare-metal
+        // assert!(chunk_size > 0);
         MutChunkIter { v: self, chunk_size: chunk_size }
     }
 
@@ -2441,7 +2469,8 @@ impl<'a,T> MutableVector<'a, T> for &'a mut [T] {
     #[inline]
     unsafe fn copy_memory(self, src: &[T]) {
         let len_src = src.len();
-        assert!(self.len() >= len_src);
+        // XXX bare-metal
+        // assert!(self.len() >= len_src);
         ptr::copy_nonoverlapping_memory(self.as_mut_ptr(), src.as_ptr(), len_src)
     }
 }
@@ -2577,7 +2606,9 @@ pub mod raw {
      * slice is empty. O(1).
      */
     pub unsafe fn shift_ptr<T>(slice: &mut Slice<T>) -> *T {
-        if slice.len == 0 { fail!("shift on empty slice"); }
+        // XXX bare-metal
+        // if slice.len == 0 { fail!("shift on empty slice"); }
+        if slice.len == 0 { unsafe { ::std::unstable::intrinsics::abort(); } }
         let head: *T = slice.data;
         slice.data = ptr::offset(slice.data, 1);
         slice.len -= 1;
@@ -2590,7 +2621,9 @@ pub mod raw {
      * slice is empty. O(1).
      */
     pub unsafe fn pop_ptr<T>(slice: &mut Slice<T>) -> *T {
-        if slice.len == 0 { fail!("pop on empty slice"); }
+        // XXX bare-metal
+        // if slice.len == 0 { fail!("pop on empty slice"); }
+        if slice.len == 0 { unsafe { ::std::unstable::intrinsics::abort(); } }
         let tail: *T = ptr::offset(slice.data, (slice.len - 1) as int);
         slice.len -= 1;
         tail

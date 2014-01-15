@@ -145,7 +145,8 @@ pub fn int_to_str_bytes_common<T:NumCast
                                 radix: uint,
                                 sign: SignFormat,
                                 f: |u8|) {
-    assert!(2 <= radix && radix <= 36);
+    // XXX bare-metal
+    // assert!(2 <= radix && radix <= 36);
 
     let _0: T = Zero::zero();
 
@@ -233,7 +234,8 @@ pub fn float_to_str_bytes_common<T:NumCast+Zero+One+Eq+Ord+Float+Round+
                                   Div<T,T>+Neg<T>+Rem<T,T>+Mul<T,T>>(
         num: T, radix: uint, negative_zero: bool,
         sign: SignFormat, digits: SignificantDigits) -> (~[u8], bool) {
-    assert!(2 <= radix && radix <= 36);
+    // XXX bare-metal
+    // assert!(2 <= radix && radix <= 36);
 
     let _0: T = Zero::zero();
     let _1: T = One::one();
@@ -483,20 +485,30 @@ pub fn from_str_bytes_common<T:NumCast+Zero+One+Eq+Ord+Div<T,T>+
         ) -> Option<T> {
     match exponent {
         ExpDec if radix >= DIGIT_E_RADIX       // decimal exponent 'e'
-          => fail!("from_str_bytes_common: radix {:?} incompatible with \
-                    use of 'e' as decimal exponent", radix),
+          // XXX bare-metal
+          // => fail!("from_str_bytes_common: radix {:?} incompatible with \
+          //           use of 'e' as decimal exponent", radix),
+          => unsafe { ::unstable::intrinsics::abort() },
         ExpBin if radix >= DIGIT_P_RADIX       // binary exponent 'p'
-          => fail!("from_str_bytes_common: radix {:?} incompatible with \
-                    use of 'p' as binary exponent", radix),
+          // XXX bare-metal
+          // => fail!("from_str_bytes_common: radix {:?} incompatible with \
+          //           use of 'p' as binary exponent", radix),
+          => unsafe { ::unstable::intrinsics::abort() },
         _ if special && radix >= DIGIT_I_RADIX // first digit of 'inf'
-          => fail!("from_str_bytes_common: radix {:?} incompatible with \
-                    special values 'inf' and 'NaN'", radix),
+          // XXX bare-metal
+          // => fail!("from_str_bytes_common: radix {:?} incompatible with \
+          //           special values 'inf' and 'NaN'", radix),
+          => unsafe { ::unstable::intrinsics::abort() },
         _ if (radix as int) < 2
-          => fail!("from_str_bytes_common: radix {:?} to low, \
-                    must lie in the range [2, 36]", radix),
+          // XXX bare-metal
+          // => fail!("from_str_bytes_common: radix {:?} to low, \
+          //           must lie in the range [2, 36]", radix),
+          => unsafe { ::unstable::intrinsics::abort() },
         _ if (radix as int) > 36
-          => fail!("from_str_bytes_common: radix {:?} to high, \
-                    must lie in the range [2, 36]", radix),
+          // XXX bare-metal
+          // => fail!("from_str_bytes_common: radix {:?} to high, \
+          //           must lie in the range [2, 36]", radix),
+          => unsafe { ::unstable::intrinsics::abort() },
         _ => ()
     }
 

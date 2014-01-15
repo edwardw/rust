@@ -19,7 +19,8 @@
 pub mod c_double {
     use libc::{c_double, c_int};
 
-    #[link_name = "m"]
+    // XXX bare-metal
+    // #[link_name = "m"]
     extern {
         // Alphabetically sorted by link_name
 
@@ -107,7 +108,8 @@ pub mod c_double {
 pub mod c_float {
     use libc::{c_float, c_int};
 
-    #[link_name = "m"]
+    // XXX bare-metal
+    // #[link_name = "m"]
     extern {
         // Alphabetically sorted by link_name
 

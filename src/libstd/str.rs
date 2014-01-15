@@ -93,7 +93,7 @@ The actual representation of strings have direct mappings to vectors:
 
 */
 
-use at_vec;
+// use at_vec;
 use cast;
 use cast::transmute;
 use char;
@@ -114,16 +114,17 @@ use uint;
 use vec;
 use vec::{OwnedVector, OwnedCopyableVector, ImmutableVector, MutableVector};
 use default::Default;
-use send_str::{SendStr, SendStrOwned};
+// use send_str::{SendStr, SendStrOwned};
 use unstable::raw::Repr;
 
 /*
 Section: Conditions
 */
 
-condition! {
-    pub not_utf8: (~str) -> ~str;
-}
+// XXX bare-metal
+// condition! {
+//     pub not_utf8: (~str) -> ~str;
+// }
 
 /*
 Section: Creating a string
@@ -135,12 +136,15 @@ Section: Creating a string
 ///
 /// Raises the `not_utf8` condition if invalid UTF-8
 pub fn from_utf8_owned(vv: ~[u8]) -> ~str {
-    use str::not_utf8::cond;
+    // XXX bare-metal
+    // use str::not_utf8::cond;
 
     if !is_utf8(vv) {
         let first_bad_byte = *vv.iter().find(|&b| !is_utf8([*b])).unwrap();
-        cond.raise(format!("from_utf8: input is not UTF-8; first bad byte is {}",
-                           first_bad_byte))
+        // XXX bare-metal
+        // cond.raise(format!("from_utf8: input is not UTF-8; first bad byte is {}",
+        //                    first_bad_byte))
+        unsafe { ::unstable::intrinsics::abort() }
     } else {
         unsafe { raw::from_utf8_owned(vv) }
     }
@@ -192,6 +196,7 @@ impl<'a> ToStr for &'a str {
     fn to_str(&self) -> ~str { self.to_owned() }
 }
 
+/* XXX bare-metal
 impl ToStr for @str {
     #[inline]
     fn to_str(&self) -> ~str { self.to_owned() }
@@ -201,6 +206,7 @@ impl<'a> FromStr for @str {
     #[inline]
     fn from_str(s: &str) -> Option<@str> { Some(s.to_managed()) }
 }
+*/
 
 /// Convert a byte to a UTF-8 string
 ///
@@ -208,7 +214,8 @@ impl<'a> FromStr for @str {
 ///
 /// Fails if invalid UTF-8
 pub fn from_byte(b: u8) -> ~str {
-    assert!(b < 128u8);
+    // XXX bare-metal
+    // assert!(b < 128u8);
     unsafe { ::cast::transmute(~[b]) }
 }
 
@@ -651,6 +658,7 @@ enum NormalizationForm {
     NFKD
 }
 
+/*
 /// External iterator for a string's normalization's characters.
 /// Use with the `std::iter` module.
 #[deriving(Clone)]
@@ -718,6 +726,7 @@ impl<'a> Iterator<char> for NormalizationIterator<'a> {
         (lower, None)
     }
 }
+*/
 
 /// Replace all occurrences of one string with another
 ///
@@ -896,8 +905,9 @@ pub fn utf16_chars(v: &[u16], f: |char|) {
 
         } else {
             let u2 = v[i+1u];
-            assert!(u >= 0xD800_u16 && u <= 0xDBFF_u16);
-            assert!(u2 >= 0xDC00_u16 && u2 <= 0xDFFF_u16);
+            // XXX bare-metal
+            // assert!(u >= 0xD800_u16 && u <= 0xDBFF_u16);
+            // assert!(u2 >= 0xDC00_u16 && u2 <= 0xDFFF_u16);
             let mut c: u32 = (u - 0xD800_u16) as u32;
             c = c << 10;
             c |= (u2 - 0xDC00_u16) as u32;
@@ -992,7 +1002,8 @@ pub mod raw {
         ptr::copy_memory(v.as_mut_ptr(), buf, len);
         v.set_len(len);
 
-        assert!(is_utf8(v));
+        // XXX bare-metal
+        // assert!(is_utf8(v));
         ::cast::transmute(v)
     }
 
@@ -1043,7 +1054,8 @@ pub mod raw {
             curr = ptr::offset(s, len as int);
         }
         let v = Slice { data: s, len: len };
-        assert!(is_utf8(::cast::transmute(v)));
+        // XXX bare-metal
+        // assert!(is_utf8(::cast::transmute(v)));
         ::cast::transmute(v)
     }
 
@@ -1057,8 +1069,9 @@ pub mod raw {
     /// If end is greater than the length of the string.
     #[inline]
     pub unsafe fn slice_bytes<'a>(s: &'a str, begin: uint, end: uint) -> &'a str {
-        assert!(begin <= end);
-        assert!(end <= s.len());
+        // XXX bare-metal
+        // assert!(begin <= end);
+        // assert!(end <= s.len());
         slice_unchecked(s, begin, end)
     }
 
@@ -1093,7 +1106,8 @@ pub mod raw {
     /// The caller must preserve the valid UTF-8 property.
     pub unsafe fn pop_byte(s: &mut ~str) -> u8 {
         let len = s.len();
-        assert!((len > 0u));
+        // XXX bare-metal
+        // assert!((len > 0u));
         let b = s[len - 1u];
         s.set_len(len - 1);
         return b;
@@ -1103,7 +1117,8 @@ pub mod raw {
     /// The caller must preserve the valid UTF-8 property.
     pub unsafe fn shift_byte(s: &mut ~str) -> u8 {
         let len = s.len();
-        assert!((len > 0u));
+        // XXX bare-metal
+        // assert!((len > 0u));
         let b = s[0];
         *s = s.slice(1, len).to_owned();
         return b;
@@ -1528,11 +1543,13 @@ pub trait StrSlice<'a> {
 
     /// An Iterator over the string in Unicode Normalization Form D
     /// (canonical decomposition).
-    fn nfd_chars(&self) -> NormalizationIterator<'a>;
+    // XXX bare-metal
+    // fn nfd_chars(&self) -> NormalizationIterator<'a>;
 
     /// An Iterator over the string in Unicode Normalization Form KD
     /// (compatibility decomposition).
-    fn nfkd_chars(&self) -> NormalizationIterator<'a>;
+    // XXX bare-metal
+    // fn nfkd_chars(&self) -> NormalizationIterator<'a>;
 
     /// Returns true if the string contains only whitespace.
     ///
@@ -1770,13 +1787,15 @@ pub trait StrSlice<'a> {
     fn to_owned(&self) -> ~str;
 
     /// Copy a slice into a new managed str.
-    fn to_managed(&self) -> @str;
+    // XXX bare-metal
+    // fn to_managed(&self) -> @str;
 
     /// Converts to a vector of `u16` encoded as UTF-16.
     fn to_utf16(&self) -> ~[u16];
 
     /// Copy a slice into a new `SendStr`.
-    fn to_send_str(&self) -> SendStr;
+    // XXX bare-metal
+    // fn to_send_str(&self) -> SendStr;
 
     /// Check that `index`-th byte lies at the start and/or end of a
     /// UTF-8 code point sequence.
@@ -2084,7 +2103,8 @@ impl<'a> StrSlice<'a> for &'a str {
 
     #[inline]
     fn match_indices(&self, sep: &'a str) -> MatchesIndexIterator<'a> {
-        assert!(!sep.is_empty())
+        // XXX bare-metal
+        // assert!(!sep.is_empty())
         MatchesIndexIterator {
             haystack: *self,
             needle: sep,
@@ -2119,25 +2139,27 @@ impl<'a> StrSlice<'a> for &'a str {
         self.split(char::is_whitespace).filter(|s| !s.is_empty())
     }
 
-    #[inline]
-    fn nfd_chars(&self) -> NormalizationIterator<'a> {
-        NormalizationIterator {
-            iter: self.chars(),
-            buffer: ~[],
-            sorted: false,
-            kind: NFD
-        }
-    }
+    // XXX bare-metal
+    // #[inline]
+    // fn nfd_chars(&self) -> NormalizationIterator<'a> {
+    //     NormalizationIterator {
+    //         iter: self.chars(),
+    //         buffer: ~[],
+    //         sorted: false,
+    //         kind: NFD
+    //     }
+    // }
 
-    #[inline]
-    fn nfkd_chars(&self) -> NormalizationIterator<'a> {
-        NormalizationIterator {
-            iter: self.chars(),
-            buffer: ~[],
-            sorted: false,
-            kind: NFKD
-        }
-    }
+    // XXX bare-metal
+    // #[inline]
+    // fn nfkd_chars(&self) -> NormalizationIterator<'a> {
+    //     NormalizationIterator {
+    //         iter: self.chars(),
+    //         buffer: ~[],
+    //         sorted: false,
+    //         kind: NFKD
+    //     }
+    // }
 
     #[inline]
     fn is_whitespace(&self) -> bool { self.chars().all(char::is_whitespace) }
@@ -2150,7 +2172,8 @@ impl<'a> StrSlice<'a> for &'a str {
 
     #[inline]
     fn slice(&self, begin: uint, end: uint) -> &'a str {
-        assert!(self.is_char_boundary(begin) && self.is_char_boundary(end));
+        // XXX bare-metal
+        // assert!(self.is_char_boundary(begin) && self.is_char_boundary(end));
         unsafe { raw::slice_bytes(*self, begin, end) }
     }
 
@@ -2161,12 +2184,14 @@ impl<'a> StrSlice<'a> for &'a str {
 
     #[inline]
     fn slice_to(&self, end: uint) -> &'a str {
-        assert!(self.is_char_boundary(end));
+        // XXX bare-metal
+        // assert!(self.is_char_boundary(end));
         unsafe { raw::slice_bytes(*self, 0, end) }
     }
 
     fn slice_chars(&self, begin: uint, end: uint) -> &'a str {
-        assert!(begin <= end);
+        // XXX bare-metal
+        // assert!(begin <= end);
         let mut count = 0;
         let mut begin_byte = None;
         let mut end_byte = None;
@@ -2182,8 +2207,11 @@ impl<'a> StrSlice<'a> for &'a str {
         if end_byte.is_none() && count == end { end_byte = Some(self.len()) }
 
         match (begin_byte, end_byte) {
-            (None, _) => fail!("slice_chars: `begin` is beyond end of string"),
-            (_, None) => fail!("slice_chars: `end` is beyond end of string"),
+            // XXX bare-metal
+            // (None, _) => fail!("slice_chars: `begin` is beyond end of string"),
+            // (_, None) => fail!("slice_chars: `end` is beyond end of string"),
+            (None, _) => unsafe { ::unstable::intrinsics::abort() },
+            (_, None) => unsafe { ::unstable::intrinsics::abort() },
             (Some(a), Some(b)) => unsafe { raw::slice_bytes(*self, a, b) }
         }
     }
@@ -2281,13 +2309,14 @@ impl<'a> StrSlice<'a> for &'a str {
         }
     }
 
-    #[inline]
-    fn to_managed(&self) -> @str {
-        unsafe {
-            let v: *&[u8] = cast::transmute(self);
-            cast::transmute(at_vec::to_managed(*v))
-        }
-    }
+    // XXX bare-metal
+    // #[inline]
+    // fn to_managed(&self) -> @str {
+    //     unsafe {
+    //         let v: *&[u8] = cast::transmute(self);
+    //         cast::transmute(at_vec::to_managed(*v))
+    //     }
+    // }
 
     fn to_utf16(&self) -> ~[u16] {
         let mut u = ~[];
@@ -2298,11 +2327,13 @@ impl<'a> StrSlice<'a> for &'a str {
             if (ch & 0xFFFF_u32) == ch {
                 // The BMP falls through (assuming non-surrogate, as it
                 // should)
-                assert!(ch <= 0xD7FF_u32 || ch >= 0xE000_u32);
+                // XXX bare-metal
+                // assert!(ch <= 0xD7FF_u32 || ch >= 0xE000_u32);
                 u.push(ch as u16)
             } else {
                 // Supplementary planes break into surrogates.
-                assert!(ch >= 0x1_0000_u32 && ch <= 0x10_FFFF_u32);
+                // XXX bare-metal
+                // assert!(ch >= 0x1_0000_u32 && ch <= 0x10_FFFF_u32);
                 ch -= 0x1_0000_u32;
                 let w1 = 0xD800_u16 | ((ch >> 10) as u16);
                 let w2 = 0xDC00_u16 | ((ch as u16) & 0x3FF_u16);
@@ -2312,10 +2343,11 @@ impl<'a> StrSlice<'a> for &'a str {
         u
     }
 
-    #[inline]
-    fn to_send_str(&self) -> SendStr {
-        SendStrOwned(self.to_owned())
-    }
+    // XXX bare-metal
+    // #[inline]
+    // fn to_send_str(&self) -> SendStr {
+    //     SendStrOwned(self.to_owned())
+    // }
 
     #[inline]
     fn is_char_boundary(&self, index: uint) -> bool {
@@ -2334,7 +2366,8 @@ impl<'a> StrSlice<'a> for &'a str {
         fn multibyte_char_range_at(s: &str, i: uint) -> CharRange {
             let mut val = s[i] as uint;
             let w = UTF8_CHAR_WIDTH[val] as uint;
-            assert!((w != 0));
+            // XXX bare-metal
+            // assert!((w != 0));
 
             val = utf8_first_byte!(val, w);
             val = utf8_acc_cont_byte!(val, s[i + 1]);
@@ -2366,7 +2399,8 @@ impl<'a> StrSlice<'a> for &'a str {
 
             let mut val = s[i] as uint;
             let w = UTF8_CHAR_WIDTH[val] as uint;
-            assert!((w != 0));
+            // XXX bare-metal
+            // assert!((w != 0));
 
             val = utf8_first_byte!(val, w);
             val = utf8_acc_cont_byte!(val, s[i + 1]);
@@ -2479,8 +2513,9 @@ impl<'a> StrSlice<'a> for &'a str {
         let b_start = inner.as_ptr() as uint;
         let b_end = b_start + inner.len();
 
-        assert!(a_start <= b_start);
-        assert!(b_end <= a_end);
+        // XXX bare-metal
+        // assert!(a_start <= b_start);
+        // assert!(b_end <= a_end);
         b_start - a_start
     }
 
@@ -2618,7 +2653,8 @@ impl OwnedStr for ~str {
     #[inline]
     fn pop_char(&mut self) -> char {
         let end = self.len();
-        assert!(end > 0u);
+        // XXX bare-metal
+        // assert!(end > 0u);
         let CharRange {ch, next} = self.char_range_at_reverse(end);
         unsafe { self.set_len(next); }
         return ch;
@@ -2687,8 +2723,9 @@ impl OwnedStr for ~str {
 
     #[inline]
     fn truncate(&mut self, len: uint) {
-        assert!(len <= self.len());
-        assert!(self.is_char_boundary(len));
+        // XXX bare-metal
+        // assert!(len <= self.len());
+        // assert!(self.is_char_boundary(len));
         unsafe { self.set_len(len); }
     }
 

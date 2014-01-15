@@ -34,9 +34,8 @@ pub use ops::{Add, Sub, Mul, Div, Rem, Neg, Not};
 pub use ops::{BitAnd, BitOr, BitXor};
 pub use ops::{Drop};
 pub use ops::{Shl, Shr, Index};
-/*
 pub use option::{Option, Some, None};
-pub use result::{Result, Ok, Err};
+// pub use result::{Result, Ok, Err};
 
 // Reexported functions
 pub use from_str::from_str;
@@ -44,19 +43,19 @@ pub use iter::range;
 
 // Reexported types and traits
 
+/*
 pub use any::{Any, AnyOwnExt, AnyRefExt, AnyMutRefExt};
 pub use ascii::{Ascii, AsciiCast, OwnedAsciiCast, AsciiStr, IntoBytes};
 pub use bool::Bool;
 pub use c_str::ToCStr;
+*/
 pub use char::Char;
 pub use clone::{Clone, DeepClone};
 pub use cmp::{Eq, Ord, TotalEq, TotalOrd, Ordering, Less, Equal, Greater, Equiv};
 pub use container::{Container, Mutable, Map, MutableMap, Set, MutableSet};
-*/
 pub use default::Default;
-/*
 pub use from_str::FromStr;
-pub use hash::Hash;
+// pub use hash::Hash;
 pub use iter::{FromIterator, Extendable};
 pub use iter::{Iterator, DoubleEndedIterator, RandomAccessIterator, CloneableIterator};
 pub use iter::{OrdIterator, MutableDoubleEndedIterator, ExactSize};
@@ -65,10 +64,12 @@ pub use num::{Bitwise, BitCount, Bounded, Integer, Real};
 pub use num::{Num, NumCast, CheckedAdd, CheckedSub, CheckedMul};
 pub use num::{Orderable, Signed, Unsigned, Round};
 pub use num::{Primitive, Int, Float, ToStrRadix, ToPrimitive, FromPrimitive};
+/*
 pub use path::{GenericPath, Path, PosixPath, WindowsPath};
 pub use ptr::RawPtr;
 pub use io::{Buffer, Writer, Reader, Seek};
 pub use send_str::{SendStr, SendStrOwned, SendStrStatic, IntoSendStr};
+*/
 pub use str::{Str, StrVector, StrSlice, OwnedStr};
 pub use to_bytes::IterBytes;
 pub use to_str::{ToStr, IntoStr};
@@ -79,11 +80,14 @@ pub use tuple::{ImmutableTuple9, ImmutableTuple10, ImmutableTuple11, ImmutableTu
 pub use tuple::{Tuple1, Tuple2, Tuple3, Tuple4};
 pub use tuple::{Tuple5, Tuple6, Tuple7, Tuple8};
 pub use tuple::{Tuple9, Tuple10, Tuple11, Tuple12};
-pub use vec::{ImmutableEqVector, ImmutableTotalOrdVector, ImmutableCopyableVector};
+// XXX bare-metal
+// pub use vec::{ImmutableEqVector, ImmutableTotalOrdVector, ImmutableCopyableVector};
+pub use vec::{ImmutableEqVector, ImmutableTotalOrdVector};
 pub use vec::{OwnedVector, OwnedCopyableVector,OwnedEqVector};
 pub use vec::{MutableVector, MutableTotalOrdVector};
 pub use vec::{Vector, VectorVector, CopyableVector, ImmutableVector};
 
+/*
 // Reexported runtime types
 pub use comm::{Port, Chan, SharedChan};
 pub use task::spawn;

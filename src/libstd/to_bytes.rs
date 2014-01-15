@@ -18,7 +18,7 @@ use cast;
 use container::Container;
 use iter::Iterator;
 use option::{None, Option, Some};
-use rc::Rc;
+// use rc::Rc;
 use str::{Str, StrSlice};
 use vec::{Vector, ImmutableVector};
 
@@ -312,6 +312,7 @@ impl<'a,A:IterBytes> IterBytes for &'a A {
     }
 }
 
+/* XXX bare-metal
 impl<A:IterBytes> IterBytes for @A {
     #[inline]
     fn iter_bytes(&self, lsb0: bool, f: Cb) -> bool {
@@ -325,6 +326,7 @@ impl<A:IterBytes> IterBytes for Rc<A> {
         self.borrow().iter_bytes(lsb0, f)
     }
 }
+*/
 
 impl<A:IterBytes> IterBytes for ~A {
     #[inline]
@@ -349,6 +351,7 @@ impl<A> IterBytes for *mut A {
     }
 }
 
+/* XXX bare-metal
 /// A trait for converting a value to a list of bytes.
 pub trait ToBytes {
     /// Converts the current value to a list of bytes. This is equivalent to
@@ -370,6 +373,7 @@ impl<A:IterBytes> ToBytes for A {
         })
     }
 }
+*/
 
 #[cfg(test)]
 mod test {

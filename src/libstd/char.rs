@@ -14,7 +14,7 @@ use cast::transmute;
 use option::{None, Option, Some};
 use iter::{Iterator, range_step};
 use str::StrSlice;
-use unicode::{derived_property, property, general_category, decompose};
+// use unicode::{derived_property, property, general_category, decompose};
 use to_str::ToStr;
 use str;
 
@@ -81,25 +81,38 @@ pub fn from_u32(i: u32) -> Option<char> {
 
 /// Returns whether the specified character is considered a unicode alphabetic
 /// character
-pub fn is_alphabetic(c: char) -> bool   { derived_property::Alphabetic(c) }
+// XXX bare-metal
+// pub fn is_alphabetic(c: char) -> bool   { derived_property::Alphabetic(c) }
+pub fn is_alphabetic(c: char) -> bool {
+    ('a' <= c && c <= 'z')
+    || ('A' <= c && c <= 'Z')
+}
 #[allow(missing_doc)]
-pub fn is_XID_start(c: char) -> bool    { derived_property::XID_Start(c) }
+// XXX bare-metal
+// pub fn is_XID_start(c: char) -> bool    { derived_property::XID_Start(c) }
+pub fn is_XID_start(c: char) -> bool    { false }
 #[allow(missing_doc)]
-pub fn is_XID_continue(c: char) -> bool { derived_property::XID_Continue(c) }
+// XXX bare-metal
+// pub fn is_XID_continue(c: char) -> bool { derived_property::XID_Continue(c) }
+pub fn is_XID_continue(c: char) -> bool { false }
 
 ///
 /// Indicates whether a character is in lower case, defined
 /// in terms of the Unicode Derived Core Property 'Lowercase'.
 ///
 #[inline]
-pub fn is_lowercase(c: char) -> bool { derived_property::Lowercase(c) }
+// XXX bare-metal
+// pub fn is_lowercase(c: char) -> bool { derived_property::Lowercase(c) }
+pub fn is_lowercase(c: char) -> bool { 'a' <= c && c <= 'z' }
 
 ///
 /// Indicates whether a character is in upper case, defined
 /// in terms of the Unicode Derived Core Property 'Uppercase'.
 ///
 #[inline]
-pub fn is_uppercase(c: char) -> bool { derived_property::Uppercase(c) }
+// XXX bare-metal
+// pub fn is_uppercase(c: char) -> bool { derived_property::Uppercase(c) }
+pub fn is_uppercase(c: char) -> bool { 'A' <= c && c <= 'Z' }
 
 ///
 /// Indicates whether a character is whitespace. Whitespace is defined in
@@ -108,9 +121,12 @@ pub fn is_uppercase(c: char) -> bool { derived_property::Uppercase(c) }
 #[inline]
 pub fn is_whitespace(c: char) -> bool {
     // As an optimization ASCII whitespace characters are checked separately
+    // XXX bare-metal
+    // c == ' '
+    //     || ('\x09' <= c && c <= '\x0d')
+    //     || property::White_Space(c)
     c == ' '
         || ('\x09' <= c && c <= '\x0d')
-        || property::White_Space(c)
 }
 
 ///
@@ -120,10 +136,12 @@ pub fn is_whitespace(c: char) -> bool {
 ///
 #[inline]
 pub fn is_alphanumeric(c: char) -> bool {
-    derived_property::Alphabetic(c)
-        || general_category::Nd(c)
-        || general_category::Nl(c)
-        || general_category::No(c)
+    // XXX bare-metal
+    // derived_property::Alphabetic(c)
+    //     || general_category::Nd(c)
+    //     || general_category::Nl(c)
+    //     || general_category::No(c)
+    is_alphabetic(c) || ('0' <= c && c<= '9')
 }
 
 ///
@@ -132,14 +150,20 @@ pub fn is_alphanumeric(c: char) -> bool {
 /// 'Cc'.
 ///
 #[inline]
-pub fn is_control(c: char) -> bool { general_category::Cc(c) }
+// XXX bare-metal
+// pub fn is_control(c: char) -> bool { general_category::Cc(c) }
+pub fn is_control(c: char) -> bool {
+    !(is_alphanumeric(c) || is_whitespace(c))
+}
 
 /// Indicates whether the character is numeric (Nd, Nl, or No)
 #[inline]
 pub fn is_digit(c: char) -> bool {
-    general_category::Nd(c)
-        || general_category::Nl(c)
-        || general_category::No(c)
+    // XXX bare-metal
+    // general_category::Nd(c)
+    //     || general_category::Nl(c)
+    //     || general_category::No(c)
+    '0' <= c && c <= '9'
 }
 
 ///
@@ -185,7 +209,9 @@ pub fn is_digit_radix(c: char, radix: uint) -> bool {
 #[inline]
 pub fn to_digit(c: char, radix: uint) -> Option<uint> {
     if radix > 36 {
-        fail!("to_digit: radix {} is too high (maximum 36)", radix);
+        // XXX bare-metal
+        // fail!("to_digit: radix {} is too high (maximum 36)", radix);
+        unsafe { ::unstable::intrinsics::abort(); }
     }
     let val = match c {
       '0' .. '9' => c as uint - ('0' as uint),
@@ -212,7 +238,9 @@ pub fn to_digit(c: char, radix: uint) -> Option<uint> {
 #[inline]
 pub fn from_digit(num: uint, radix: uint) -> Option<char> {
     if radix > 36 {
-        fail!("from_digit: radix {} is to high (maximum 36)", num);
+        // XXX bare-metal
+        // fail!("from_digit: radix {} is to high (maximum 36)", num);
+        unsafe { ::unstable::intrinsics::abort(); }
     }
     if num < radix {
         unsafe {
@@ -256,6 +284,7 @@ fn decompose_hangul(s: char, f: |char|) {
     }
 }
 
+/* XXX bare-metal
 /// Returns the canonical decomposition of a character.
 pub fn decompose_canonical(c: char, f: |char|) {
     if (c as uint) < S_BASE || (c as uint) >= (S_BASE + S_COUNT) {
@@ -273,6 +302,7 @@ pub fn decompose_compatible(c: char, f: |char|) {
         decompose_hangul(c, f);
     }
 }
+*/
 
 ///
 /// Return the hexadecimal unicode escape of a char.
@@ -340,7 +370,9 @@ pub fn len_utf8_bytes(c: char) -> uint {
         _ if code < MAX_TWO_B   => 2u,
         _ if code < MAX_THREE_B => 3u,
         _ if code < MAX_FOUR_B  => 4u,
-        _                       => fail!("invalid character!"),
+        // XXX bare-metal
+        // _                       => fail!("invalid character!"),
+        _                       => unsafe { ::unstable::intrinsics::abort() },
     }
 }
 

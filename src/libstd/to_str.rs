@@ -16,9 +16,9 @@ The `ToStr` trait for converting to strings
 
 use option::{Some, None};
 use str::OwnedStr;
-use hashmap::HashMap;
-use hashmap::HashSet;
-use hash::Hash;
+// use hashmap::HashMap;
+// use hashmap::HashSet;
+// use hash::Hash;
 use iter::Iterator;
 use cmp::Eq;
 use vec::ImmutableVector;
@@ -45,12 +45,15 @@ impl<A:ToStr> ToStr for (A,) {
     fn to_str(&self) -> ~str {
         match *self {
             (ref a,) => {
-                format!("({},)", (*a).to_str())
+                // XXX bare-metal
+                // format!("({},)", (*a).to_str())
+                ~"({},): FIXME bare-metal"
             }
         }
     }
 }
 
+/*
 impl<A:ToStr+Hash+Eq, B:ToStr> ToStr for HashMap<A, B> {
     #[inline]
     fn to_str(&self) -> ~str {
@@ -90,6 +93,7 @@ impl<A:ToStr+Hash+Eq> ToStr for HashSet<A> {
         acc
     }
 }
+*/
 
 impl<A:ToStr,B:ToStr> ToStr for (A, B) {
     #[inline]
@@ -98,7 +102,9 @@ impl<A:ToStr,B:ToStr> ToStr for (A, B) {
         //let &(ref a, ref b) = self;
         match *self {
             (ref a, ref b) => {
-                format!("({}, {})", (*a).to_str(), (*b).to_str())
+                // XXX bare-metal
+                // format!("({}, {})", (*a).to_str(), (*b).to_str())
+                ~"({},{}) FIXME: bare-metal"
             }
         }
     }
@@ -111,11 +117,13 @@ impl<A:ToStr,B:ToStr,C:ToStr> ToStr for (A, B, C) {
         //let &(ref a, ref b, ref c) = self;
         match *self {
             (ref a, ref b, ref c) => {
-                format!("({}, {}, {})",
-                    (*a).to_str(),
-                    (*b).to_str(),
-                    (*c).to_str()
-                )
+                // XXX bare-metal
+                // format!("({}, {}, {})",
+                //     (*a).to_str(),
+                //     (*b).to_str(),
+                //     (*c).to_str()
+                // )
+                ~"({}, {}, {}) FIXME: bare-metal"
             }
         }
     }

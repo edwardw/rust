@@ -809,8 +809,12 @@ impl num::ToStrRadix for f64 {
     fn to_str_radix(&self, rdx: uint) -> ~str {
         let (r, special) = strconv::float_to_str_common(
             *self, rdx, true, strconv::SignNeg, strconv::DigAll);
-        if special { fail!("number has a special value, \
-                             try to_str_radix_special() if those are expected") }
+        // XXX bare-metal
+        // if special { fail!("number has a special value, \
+        //                      try to_str_radix_special() if those are expected") }
+        if special {
+            unsafe { ::unstable::intrinsics::abort() }
+        }
         r
     }
 }

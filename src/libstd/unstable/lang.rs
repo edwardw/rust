@@ -25,13 +25,14 @@ pub fn fail_(expr: *c_char, file: *c_char, line: size_t) -> ! {
     unsafe { ::unstable::intrinsics::abort() }
 }
 
-/*
 #[cold]
 #[lang="fail_bounds_check"]
 pub fn fail_bounds_check(file: *c_char, line: size_t, index: size_t, len: size_t) -> ! {
-    let msg = format!("index out of bounds: the len is {} but the index is {}",
-                      len as uint, index as uint);
-    msg.with_c_str(|buf| fail_(buf, file, line))
+    // XXX bare-metal
+    // let msg = format!("index out of bounds: the len is {} but the index is {}",
+    //                   len as uint, index as uint);
+    // msg.with_c_str(|buf| fail_(buf, file, line))
+    unsafe { ::unstable::intrinsics::abort() }
 }
 
 #[lang="malloc"]
@@ -47,6 +48,7 @@ pub unsafe fn local_free(ptr: *c_char) {
     ::rt::local_heap::local_free(ptr);
 }
 
+/* XXX bare-metal
 #[lang="borrow_as_imm"]
 #[inline]
 pub unsafe fn borrow_as_imm(a: *u8, file: *c_char, line: size_t) -> uint {

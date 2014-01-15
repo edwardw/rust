@@ -9,7 +9,33 @@
 
 pub mod prelude;
 
+#[path = "num/float_macros.rs"] mod float_macros;
+#[path = "num/int_macros.rs"]   mod int_macros;
+#[path = "num/uint_macros.rs"]  mod uint_macros;
+
+#[path = "num/int.rs"]  pub mod int;
+#[path = "num/i8.rs"]   pub mod i8;
+#[path = "num/i16.rs"]  pub mod i16;
+#[path = "num/i32.rs"]  pub mod i32;
+#[path = "num/i64.rs"]  pub mod i64;
+
+#[path = "num/uint.rs"] pub mod uint;
+#[path = "num/u8.rs"]   pub mod u8;
+#[path = "num/u16.rs"]  pub mod u16;
+#[path = "num/u32.rs"]  pub mod u32;
+#[path = "num/u64.rs"]  pub mod u64;
+
+#[path = "num/f32.rs"]   pub mod f32;
+#[path = "num/f64.rs"]   pub mod f64;
+
+pub mod char;
+pub mod tuple;
+
+pub mod vec;
+pub mod str;
+
 pub mod ptr;
+pub mod borrow;
 
 /* Core language traits */
 
@@ -19,7 +45,11 @@ pub mod ptr;
 
 /* Common traits */
 
+pub mod from_str;
+pub mod num;
 pub mod iter;
+pub mod to_str;
+pub mod to_bytes;
 pub mod clone;
 pub mod container;
 pub mod default;
@@ -42,6 +72,11 @@ pub mod mem;
 #[unstable]
 pub mod unstable;
 
+/* For internal use, not exported */
+
+#[path = "num/cmath.rs"]
+mod cmath;
+
 #[unstable]
 pub mod rt;
 
@@ -52,5 +87,8 @@ mod std {
     pub use kinds;
     pub use option;
     pub use rt;
+    pub use str;
+    pub use to_bytes;
+    pub use to_str;
     pub use unstable;
 }

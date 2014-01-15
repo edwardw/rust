@@ -65,12 +65,12 @@ the rest of the rust manuals.
 */
 
 use cmp;
-// use num::{Zero, One, Integer, CheckedAdd, CheckedSub, Saturating, ToPrimitive};
+use num::{Zero, One, Integer, CheckedAdd, CheckedSub, Saturating, ToPrimitive};
 use option::{Option, Some, None};
 use ops::{Add, Mul, Sub};
 use cmp::{Eq, Ord};
 use clone::Clone;
-// use uint;
+use uint;
 use util;
 
 /// Conversion from an `Iterator`
@@ -814,7 +814,6 @@ impl<'a, A, T: DoubleEndedIterator<A>> DoubleEndedIterator<A> for ByRef<'a, T> {
     fn next_back(&mut self) -> Option<A> { self.iter.next_back() }
 }
 
-/*
 /// A trait for iterators over elements which can be added together
 pub trait AdditiveIterator<A> {
     /// Iterates over the entire iterator, summing up all the elements
@@ -866,7 +865,6 @@ impl<A: Mul<A, A> + One, T: Iterator<A>> MultiplicativeIterator<A> for T {
         self.fold(one, |p, x| p * x)
     }
 }
-*/
 
 /// A trait for iterators over elements which can be compared to one another.
 /// The type of each element must ascribe to the `Ord` trait.
@@ -914,7 +912,6 @@ impl<A: Ord, T: Iterator<A>> OrdIterator<A> for T {
     }
 }
 
-/*
 /// A trait for iterators that are cloneable.
 pub trait CloneableIterator {
     /// Repeats an iterator endlessly
@@ -989,7 +986,6 @@ impl<A, T: Clone + RandomAccessIterator<A>> RandomAccessIterator<A> for Cycle<T>
         }
     }
 }
-*/
 
 /// An iterator which strings two iterators together
 #[deriving(Clone)]
@@ -1888,7 +1884,6 @@ pub struct Range<A> {
 
 /// Return an iterator over the range [start, stop)
 #[inline]
-/* XXX bare-metal
 pub fn range<A: Add<A, A> + Ord + Clone + One>(start: A, stop: A) -> Range<A> {
     Range{state: start, stop: stop, one: One::one()}
 }
@@ -1952,7 +1947,6 @@ impl<A: Integer + Ord + Clone + ToPrimitive> DoubleEndedIterator<A> for Range<A>
         }
     }
 }
-*/
 
 /// An iterator over the range [start, stop]
 #[deriving(Clone, DeepClone)]
@@ -1961,7 +1955,6 @@ pub struct RangeInclusive<A> {
     priv done: bool
 }
 
-/*
 /// Return an iterator over the range [start, stop]
 #[inline]
 pub fn range_inclusive<A: Add<A, A> + Ord + Clone + One + ToPrimitive>(start: A, stop: A)
@@ -2017,7 +2010,6 @@ impl<A: Sub<A, A> + Integer + Ord + Clone + ToPrimitive> DoubleEndedIterator<A>
         }
     }
 }
-*/
 
 /// An iterator over the range [start, stop) by `step`. It handles overflow by stopping.
 #[deriving(Clone, DeepClone)]
@@ -2028,7 +2020,6 @@ pub struct RangeStep<A> {
     priv rev: bool
 }
 
-/*
 /// Return an iterator over the range [start, stop) by `step`. It handles overflow by stopping.
 #[inline]
 pub fn range_step<A: CheckedAdd + Ord + Clone + Zero>(start: A, stop: A, step: A) -> RangeStep<A> {
@@ -2051,7 +2042,6 @@ impl<A: CheckedAdd + Ord + Clone> Iterator<A> for RangeStep<A> {
         }
     }
 }
-*/
 
 /// An iterator over the range [start, stop] by `step`. It handles overflow by stopping.
 #[deriving(Clone, DeepClone)]
@@ -2063,7 +2053,6 @@ pub struct RangeStepInclusive<A> {
     priv done: bool
 }
 
-/*
 /// Return an iterator over the range [start, stop] by `step`. It handles overflow by stopping.
 #[inline]
 pub fn range_step_inclusive<A: CheckedAdd + Ord + Clone + Zero>(start: A, stop: A,
@@ -2088,7 +2077,6 @@ impl<A: CheckedAdd + Ord + Clone + Eq> Iterator<A> for RangeStepInclusive<A> {
         }
     }
 }
-*/
 
 /// An iterator that repeats an element endlessly
 #[deriving(Clone, DeepClone)]
@@ -2104,7 +2092,6 @@ impl<A: Clone> Repeat<A> {
     }
 }
 
-/*
 impl<A: Clone> Iterator<A> for Repeat<A> {
     #[inline]
     fn next(&mut self) -> Option<A> { self.idx(0) }
@@ -2123,7 +2110,6 @@ impl<A: Clone> RandomAccessIterator<A> for Repeat<A> {
     #[inline]
     fn idx(&self, _: uint) -> Option<A> { Some(self.element.clone()) }
 }
-*/
 
 /// Functions for lexicographical ordering of sequences.
 ///

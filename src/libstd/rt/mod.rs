@@ -105,10 +105,12 @@ pub mod thread;
 
 /// The runtime configuration, read from environment variables.
 pub mod env;
+*/
 
 /// The local, managed heap
 pub mod local_heap;
 
+/*
 /// The Logger trait and implementations
 pub mod logging;
 
